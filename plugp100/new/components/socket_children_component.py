@@ -8,10 +8,11 @@ from plugp100.responses.child_device_list import PowerStripChild
 
 
 class SocketChildrenComponent(DeviceComponent):
-    def __init__(self, parent_device: TapoDevice, client: TapoClient):
+    def __init__(self, parent_device: TapoDevice, client: TapoClient, parent_has_energy_monitoring: bool = False):
         self._client = client
         self._children_socket: [TapoStripSocket] = []
         self._parent_device = parent_device
+        self._parent_has_energy_monitoring = parent_has_energy_monitoring
 
     @property
     def sockets(self) -> [TapoStripSocket]:
@@ -31,6 +32,7 @@ class SocketChildrenComponent(DeviceComponent):
                     client=self._client,
                     parent_device=self._parent_device.device_info,
                     child_id=socket.device_id,
+                    parent_has_energy_monitoring=self._parent_has_energy_monitoring,
                 )
                 self._children_socket.append(socket_device)
                 await socket_device.update()

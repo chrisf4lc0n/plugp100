@@ -17,9 +17,11 @@ class TapoStripSocket(TapoDevice):
         client: TapoClient,
         child_id: str,
         parent_device: DeviceInfo,
+        parent_has_energy_monitoring: bool = False,
     ):
         super().__init__(host, port, client, DeviceType.Plug, child_id)
         self._parent_info = parent_device
+        self._parent_has_energy_monitoring = parent_has_energy_monitoring
 
     async def turn_on(self):
         return await self.get_component(OnOffComponent).turn_on()
@@ -38,6 +40,7 @@ class TapoStripSocket(TapoDevice):
     def _get_components_to_activate(self, components: Components) -> list[C]:
         activated = [OnOffComponent(self.client, self._child_id)]
         # Add EnergyComponent for power strips that support energy monitoring (e.g., P304M)
-        if components.has("energy_monitoring"):
+        # Use parent's energy_monitoring capability since sockets inherit this from the parent device
+        if self._parent_has_energy_monitoring:
             activated.append(EnergyComponent(self.client, self._child_id))
         return activated

@@ -36,8 +36,9 @@ class TapoPlug(TapoDevice):
 
     def _get_components_to_activate(self, components: Components) -> list[C]:
         active_components = [OnOffComponent(self.client)]
-        if components.has("energy_monitoring"):
+        has_energy_monitoring = components.has("energy_monitoring")
+        if has_energy_monitoring:
             active_components.append(EnergyComponent(self.client))
         if components.has("control_child"):
-            active_components.append(SocketChildrenComponent(self, self.client))
+            active_components.append(SocketChildrenComponent(self, self.client, has_energy_monitoring))
         return active_components
