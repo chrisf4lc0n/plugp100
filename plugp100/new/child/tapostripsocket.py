@@ -1,6 +1,7 @@
 from typing import Optional
 
 from plugp100.api.tapo_client import TapoClient
+from plugp100.new.components.energy_component import EnergyComponent
 from plugp100.new.components.on_off_component import OnOffComponent
 from plugp100.new.device_type import DeviceType
 from plugp100.new.tapodevice import TapoDevice, C
@@ -35,4 +36,8 @@ class TapoStripSocket(TapoDevice):
         return self._parent_info.device_id
 
     def _get_components_to_activate(self, components: Components) -> list[C]:
-        return [OnOffComponent(self.client, self._child_id)]
+        activated = [OnOffComponent(self.client, self._child_id)]
+        # Add EnergyComponent for power strips that support energy monitoring (e.g., P304M)
+        if components.has("energy_monitoring"):
+            activated.append(EnergyComponent(self.client, self._child_id))
+        return activated
